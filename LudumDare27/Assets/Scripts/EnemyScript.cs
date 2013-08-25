@@ -11,7 +11,7 @@ public class EnemyScript : MonoBehaviour {
         Die
     }
 
-    private const float PREPARE_TIME = 1.0f;
+    private const float PREPARE_TIME = 0.75f;
     private const float ATTACK_TIME = 0.5f; // Change to an animation time
 
     private EnemyState state = EnemyState.Guard;

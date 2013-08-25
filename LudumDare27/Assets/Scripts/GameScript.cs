@@ -21,22 +21,25 @@ public class GameScript : MonoBehaviour
     private GameState state = GameState.GetReady;
     private float timer = 0.0f;
 
-    private GameObject player;
     private bool hitted = false;
     private bool gotHit = false;
-
-    private GameObject enemy;
+    
     private int maxEnemyAttacks = 3;
     private float numEnemyAttacks = 0;
-    private List<int> enemyAttackTimes = new List<int>();
+    private List<float> enemyAttackTimes = new List<float>();
 
-    private Camera cam;
+    public GameObject Player;
+    public GameObject Enemy;
+
+    public GUIText StateText;
+    public GUIText TimeText;
 
 	private void Start ()
 	{
-	    player = GameObject.Find("Player");
-	    enemy = GameObject.Find("Enemy");
-	    cam = Camera.main;
+	    Player = GameObject.Find("Player");
+	    Enemy = GameObject.Find("Enemy");
+
+        TimeText.gameObject.SetActive(false);
 	}
 	
     private void Update()
@@ -52,66 +55,79 @@ public class GameScript : MonoBehaviour
             case GameState.GetReady:
                 ResetBattle();
                 state = GameState.Battle;
-                cam.backgroundColor = Color.red;
+                TimeText.gameObject.SetActive(true);
+                StateText.text = "Battle!!!";
                 break;
 
             case GameState.Battle:
                 timer -= Time.deltaTime;
 
+                TimeText.text = ((int)timer + 1).ToString();
+
                 if (timer <= 0.0f &&
-                    player.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Prepare &&
-                    player.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Attack)
+                    Player.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Prepare &&
+                    Player.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Attack)
                 {
                     state = GameState.GameOver;
-                    cam.backgroundColor = Color.black;
+                    TimeText.gameObject.SetActive(false);
+                    StateText.text = "GAME OVER!";
                 }
                 else
                 {
-                    if (timer <= 5.0f &&
-                        numEnemyAttacks < maxEnemyAttacks)
+                    if (enemyAttackTimes.Count > 0)
                     {
-                        enemy.GetComponent<EnemyScript>().Attack();
-                        numEnemyAttacks++;
+                        float time = enemyAttackTimes[0];
+
+                        if (timer <= time &&
+                            numEnemyAttacks < maxEnemyAttacks &&
+                            Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
+                        {
+                            Enemy.GetComponent<EnemyScript>().Attack();
+                            enemyAttackTimes.RemoveAt(0);
+                            numEnemyAttacks++;
+                        }
                     }
 
                     if (Input.GetKeyDown(KeyCode.Space) &&
                         hitted == false &&
                         gotHit == false &&
-                        player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard)
                     {
-                        player.GetComponent<PlayerScript>().Attack();
+                        Player.GetComponent<PlayerScript>().Attack();
                     }
 
                     // Change to an collision detect
                     if (hitted == false &&
-                        player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Attack &&
-                        enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Prepare)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Attack &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Prepare)
                     {
                         hitted = true;
                     }
 
                     // Change to an collision detect
                     if (gotHit == false &&
-                        player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Prepare &&
-                        enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Attack)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Prepare &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Attack)
                     {
                         gotHit = true;
                     }
 
                     if (hitted == true &&
-                        player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard &&
-                        enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
                     {
                         state = GameState.Victory;
-                        cam.backgroundColor = Color.green;
+                        TimeText.gameObject.SetActive(false);
+                        StateText.text = "VICTORY!";
                     }
 
                     if (gotHit == true &&
-                        player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard &&
-                        enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
                     {
                         state = GameState.GameOver;
-                        cam.backgroundColor = Color.black;
+                        TimeText.gameObject.SetActive(false);
+                        StateText.text = "GAME OVER!";
                     }
                 }
 
@@ -121,7 +137,7 @@ public class GameScript : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
                     state = GameState.GetReady;
-                    cam.backgroundColor = Color.yellow;
+                    StateText.text = "Get Ready!";
                 }
                 break;
 
@@ -129,7 +145,7 @@ public class GameScript : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
                     state = GameState.GetReady;
-                    cam.backgroundColor = Color.yellow;
+                    StateText.text = "Get Ready!";
                 }
                 break;
         }
@@ -138,18 +154,17 @@ public class GameScript : MonoBehaviour
     private void ResetBattle()
     {
         timer = TURN_TIME;
-        maxEnemyAttacks = 1;
+
+        maxEnemyAttacks = (int)UnityEngine.Random.Range(1, 3);
         numEnemyAttacks = 0;
         hitted = false;
         gotHit = false;
-
-        System.Random rng = new System.Random();
 
         int interval = (int) TURN_TIME / maxEnemyAttacks;
 
         for (int i = maxEnemyAttacks; i > 0 ; i--)
         {
-            enemyAttackTimes.Add(rng.Next(interval) + (interval + 1) * i);
+            enemyAttackTimes.Add(UnityEngine.Random.Range(0, interval) + interval * (i - 1) + 1);
         }
     }
 }
