@@ -98,20 +98,26 @@ public class GameScript : MonoBehaviour
                         }
                     }
 
-                    if (Input.GetKeyDown(KeyCode.Space) &&
+                    if (Input.GetButtonDown("Attack") &&
                         hitted == false &&
                         gotHit == false &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle)
                     {
                         Player.GetComponent<PlayerScript>().Attack();
                     }
 
                     // Change to an collision detect
-                    if (hitted == false &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Attack &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Prepare)
-                    {
+                    if ( hitted == false &&
+                        Player.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Attack &&
+                        Enemy.GetComponent<EnemyScript>().GetState () == EnemyScript.EnemyState.Prepare ) {
                         hitted = true;
+                    } 
+                    
+                    if ( hitted == false &&
+                        Player.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Attack &&
+                        Enemy.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
+                    {
+                        Enemy.GetComponent<EnemyScript>().Guard();
                     }
 
                     // Change to an collision detect
@@ -121,20 +127,29 @@ public class GameScript : MonoBehaviour
                     {
                         gotHit = true;
                     }
+                    
+                    if (gotHit == false &&
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Attack)
+                    {
+                        Player.GetComponent<PlayerScript>().Guard();
+                    }
 
                     if (hitted == true &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Idle)
                     {
+                        Enemy.GetComponent<EnemyScript>().Die();
                         state = GameState.Victory;
                         TimeText.gameObject.SetActive(false);
                         StateText.text = "VICTORY!";
                     }
 
                     if (gotHit == true &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Guard &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
+                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle &&
+                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Idle)
                     {
+                        Player.GetComponent<PlayerScript>().Die();
                         state = GameState.GameOver;
                         TimeText.gameObject.SetActive(false);
                         StateText.text = "GAME OVER!";
@@ -144,7 +159,7 @@ public class GameScript : MonoBehaviour
                 break;
 
             case GameState.Victory:
-                if (Input.GetKeyDown(KeyCode.Return))
+                if (Input.GetButtonDown("Reset"))
                 {
                     state = GameState.GetReady;
                     StateText.text = "Get Ready!";
@@ -152,7 +167,7 @@ public class GameScript : MonoBehaviour
                 break;
 
             case GameState.GameOver:
-                if (Input.GetKeyDown(KeyCode.Return))
+                if ( Input.GetButtonDown("Reset"))
                 {
                     state = GameState.GetReady;
                     StateText.text = "Get Ready!";

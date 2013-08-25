@@ -23,7 +23,6 @@ public class Sprite {
         this.go.transform.parent = parent;
         if ( transparency ) {
             this.go.renderer.material = (Material)Resources.Load ( "Material/Transparency", typeof ( Material ) );
-            Debug.Log ( this.go.renderer.material );
             this.go.renderer.material.color = Color.white;
         }
         this.go.renderer.material.mainTexture = this.texture;
