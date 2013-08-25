@@ -10,8 +10,8 @@ public class Sprite {
     public string name = "";
     public bool visible = true;
     public GameObject go;
-    
-    public Sprite ( float w, float h, Vector3 pos, Quaternion rot, string name, Transform parent, Texture2D tex, string script ) {
+
+    public Sprite ( float w, float h, Vector3 pos, Quaternion rot, string name, Transform parent, Texture2D tex, string script, bool transparency ) {
         this.position = pos;
         this.width = w;
         this.height = h;
@@ -21,7 +21,11 @@ public class Sprite {
 
         this.go = GameObject.CreatePrimitive ( PrimitiveType.Plane );
         this.go.transform.parent = parent;
-        this.go.renderer.material.shader = Shader.Find("Unlit/Transparent");
+        if ( transparency ) {
+            this.go.renderer.material = (Material)Resources.Load ( "Material/Transparency", typeof ( Material ) );
+            Debug.Log ( this.go.renderer.material );
+            this.go.renderer.material.color = Color.white;
+        }
         this.go.renderer.material.mainTexture = this.texture;
         this.go.transform.localPosition = new Vector3 ( (float)-Screen.width / 2 + this.position.x, (float)Screen.height / 2 - this.position.y, (float)this.position.z );
         this.go.transform.localScale = new Vector3 ( (float)this.width / 10, 1f, (float)this.height / 10 );

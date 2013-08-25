@@ -8,6 +8,9 @@ public class GameScript : MonoBehaviour
 
     public enum GameState
     {
+        MainMenu,
+        Help,
+        About,
         Pause,
         Transition,
         GetReady,
@@ -28,16 +31,23 @@ public class GameScript : MonoBehaviour
     private float numEnemyAttacks = 0;
     private List<float> enemyAttackTimes = new List<float>();
 
-    public GameObject Player;
-    public GameObject Enemy;
+    private GameObject Player, Enemy, BG;
+    private SpriteManager spriteManager;
 
     public GUIText StateText;
     public GUIText TimeText;
 
+    public Texture2D playerIdle, playerPrepare, playerDash, playerDef, playerHit, playerJump, playerDying, playerDead,
+                     enemyIdle, enemyPrepare, enemyDash, enemyDef, enemyHit, enemyJump, enemyDying, enemyDead,
+                     bg, sword;
+
 	private void Start ()
 	{
-	    Player = GameObject.Find("Player");
-	    Enemy = GameObject.Find("Enemy");
+        spriteManager = GetComponent<SpriteManager> ();
+        
+        Player = spriteManager.AddSprite( 120f, 160f, new Vector3( 200f, Screen.height * 0.8f, 1f), Quaternion.identity, "Player", playerIdle, "PlayerScript", true ).go;
+        Enemy = spriteManager.AddSprite ( 120f, 160f, new Vector3 ( Screen.width - 200f, Screen.height * 0.8f, 1f ), Quaternion.identity, "Enemy", playerIdle, "EnemyScript", true ).go;
+        BG = spriteManager.AddSprite ( Screen.height * 6f, Screen.height, new Vector3 ( Screen.height * 6f * 0.5f, Screen.height * 0.5f, 2f ), Quaternion.identity, "Background", bg, null, false ).go;
 
         TimeText.gameObject.SetActive(false);
 	}
@@ -166,5 +176,9 @@ public class GameScript : MonoBehaviour
         {
             enemyAttackTimes.Add(UnityEngine.Random.Range(0, interval) + interval * (i - 1) + 1);
         }
+    }
+
+    public void setState ( GameState state ) {
+        this.state = state;
     }
 }
