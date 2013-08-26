@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Holoville.HOTween;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -27,6 +28,9 @@ public class PlayerScript : MonoBehaviour
     private void Start()
     {
         gs = GameObject.Find("GameLogic").GetComponent<GameScript> ();
+
+        HOTween.Init ( false, false, true );
+        HOTween.EnableOverwriteManager ();
     }
 	
     private void Update()
@@ -59,6 +63,7 @@ public class PlayerScript : MonoBehaviour
                     timer = ATTACK_TIME;
                     gs.Player.width = 140f;
                     gs.Player.height = 140f;
+                    HOTween.To ( gs.Player, ATTACK_TIME, "position", gs.Enemy.position );
                 }
                 break;
 
@@ -70,6 +75,31 @@ public class PlayerScript : MonoBehaviour
                     state = PlayerState.Idle;
                     gs.Player.width = 100f;
                     gs.Player.height = 160f;
+                    gs.Player.texture = gs.playerJump;
+
+                    Sequence sequence = new Sequence ();
+                    sequence.Append ( HOTween.To ( gs.Player, 0.06f, new TweenParms ()
+                        .Prop ( "position", gs.startPlayerPos + new Vector3 ( ( gs.Player.position.x - gs.startPlayerPos.x ) * 0.8f, -50f ) )
+                        .Ease ( EaseType.EaseOutQuad ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Player, 0.08f, new TweenParms ()
+                        .Prop ( "position", gs.startPlayerPos + new Vector3 ( ( gs.Player.position.x - gs.startPlayerPos.x ) * 0.6f, -100f ) )
+                        .Ease ( EaseType.Linear ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Player, 0.1f, new TweenParms ()
+                        .Prop ( "position", gs.startPlayerPos + new Vector3 ( ( gs.Player.position.x - gs.startPlayerPos.x ) * 0.4f, -100f ) )
+                        .Ease ( EaseType.Linear ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Player, 0.08f, new TweenParms ()
+                        .Prop ( "position", gs.startPlayerPos + new Vector3 ( ( gs.Player.position.x - gs.startPlayerPos.x ) * 0.2f, -50f ) )
+                        .Ease ( EaseType.Linear ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Player, 0.06f, new TweenParms ()
+                        .Prop ( "position", gs.startPlayerPos )
+                        .Ease ( EaseType.EaseInQuad )
+                        .OnComplete ( SetIdleTexture ) )
+                    );
+                    sequence.Play ();
                 }
                 break;
 
@@ -113,10 +143,18 @@ public class PlayerScript : MonoBehaviour
         timer = DYING_TIME;
         gs.Player.width = 160f;
         gs.Player.height = 120f;
+        HOTween.To ( gs.Player, ATTACK_TIME, "position", gs.startPlayerPos - new Vector3 ( 100f, 0, 0 ) );
     }
 
     public void Reset () {
         state = PlayerState.Idle;
+        gs.Player.width = 100f;
+        gs.Player.height = 160f;
+        gs.Player.position = gs.startPlayerPos;
+    }
+
+    private void SetIdleTexture () {
+        gs.Player.texture = gs.playerIdle;
         gs.Player.width = 100f;
         gs.Player.height = 160f;
     }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Holoville.HOTween;
 
 public class EnemyScript : MonoBehaviour {
 
@@ -53,6 +54,7 @@ public class EnemyScript : MonoBehaviour {
 	                timer = ATTACK_TIME;
                     gs.Enemy.width = 140f;
                     gs.Enemy.height = 140f;
+                    HOTween.To ( gs.Enemy, ATTACK_TIME, "position", gs.Player.position );
 	            }
 	            break;
 
@@ -64,6 +66,31 @@ public class EnemyScript : MonoBehaviour {
 	                state = EnemyState.Idle;
                     gs.Enemy.width = 100f;
                     gs.Enemy.height = 160f;
+                    gs.Enemy.texture = gs.enemyJump;
+
+                    Sequence sequence = new Sequence ();
+                    sequence.Append ( HOTween.To ( gs.Enemy, 0.06f, new TweenParms ()
+                        .Prop ( "position", gs.startEnemyPos + new Vector3 ( ( gs.Enemy.position.x - gs.startEnemyPos.x ) * 0.8f, -50f ) )
+                        .Ease ( EaseType.EaseOutQuad ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Enemy, 0.08f, new TweenParms ()
+                        .Prop ( "position", gs.startEnemyPos + new Vector3 ( ( gs.Enemy.position.x - gs.startEnemyPos.x ) * 0.6f, -100f ) )
+                        .Ease ( EaseType.Linear ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Enemy, 0.1f, new TweenParms ()
+                        .Prop ( "position", gs.startEnemyPos + new Vector3 ( ( gs.Enemy.position.x - gs.startEnemyPos.x ) * 0.4f, -100f ) )
+                        .Ease ( EaseType.Linear ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Enemy, 0.08f, new TweenParms ()
+                        .Prop ( "position", gs.startEnemyPos + new Vector3 ( ( gs.Enemy.position.x - gs.startEnemyPos.x ) * 0.2f, -50f ) )
+                        .Ease ( EaseType.Linear ) )
+                    );
+                    sequence.Append ( HOTween.To ( gs.Enemy, 0.06f, new TweenParms ()
+                        .Prop ( "position", gs.startEnemyPos )
+                        .Ease ( EaseType.EaseInQuad )
+                        .OnComplete ( SetIdleTexture ) )
+                    );
+                    sequence.Play ();
 	            }
 	            break;
 
@@ -112,6 +139,13 @@ public class EnemyScript : MonoBehaviour {
 
     public void Reset () {
         state = EnemyState.Idle;
+        gs.Enemy.width = 100f;
+        gs.Enemy.height = 160f;
+        gs.Enemy.position = gs.startEnemyPos;
+    }
+
+    private void SetIdleTexture () {
+        gs.Enemy.texture = gs.enemyIdle;
         gs.Enemy.width = 100f;
         gs.Enemy.height = 160f;
     }
