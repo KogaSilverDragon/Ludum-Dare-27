@@ -18,8 +18,8 @@ public class SpriteManager : MonoBehaviour {
         }
 	}
 
-    public Sprite AddSprite ( float w, float h, Vector3 pos, Quaternion rot, string name, Texture2D tex, string script, bool transparency ) {
-        Sprite sprite = new Sprite ( w, h, pos, rot, name, Camera.main.transform, tex, script, transparency );
+    public Sprite AddSprite ( float w, float h, Vector3 pos, Quaternion rot, string name, Texture2D tex, string script, bool transparency, bool flipH ) {
+        Sprite sprite = new Sprite ( w, h, pos, rot, name, Camera.main.transform, tex, script, transparency, flipH );
         sprites.Add ( name, sprite );
         return sprite;
     }

@@ -31,7 +31,7 @@ public class GameScript : MonoBehaviour
     private float numEnemyAttacks = 0;
     private List<float> enemyAttackTimes = new List<float>();
 
-    private GameObject Player, Enemy, BG;
+    public Sprite Player, Enemy, BG;
     private SpriteManager spriteManager;
 
     public GUIText StateText;
@@ -44,10 +44,10 @@ public class GameScript : MonoBehaviour
 	private void Start ()
 	{
         spriteManager = GetComponent<SpriteManager> ();
-        
-        Player = spriteManager.AddSprite( 120f, 160f, new Vector3( 200f, Screen.height * 0.8f, 1f), Quaternion.identity, "Player", playerIdle, "PlayerScript", true ).go;
-        Enemy = spriteManager.AddSprite ( 120f, 160f, new Vector3 ( Screen.width - 200f, Screen.height * 0.8f, 1f ), Quaternion.identity, "Enemy", playerIdle, "EnemyScript", true ).go;
-        BG = spriteManager.AddSprite ( Screen.height * 6f, Screen.height, new Vector3 ( Screen.height * 6f * 0.5f, Screen.height * 0.5f, 2f ), Quaternion.identity, "Background", bg, null, false ).go;
+
+        Player = spriteManager.AddSprite ( 100f, 160f, new Vector3 ( 200f, Screen.height * 0.8f, 1f ), Quaternion.identity, "Player", playerIdle, "PlayerScript", true, true );
+        Enemy = spriteManager.AddSprite ( 100f, 160f, new Vector3 ( Screen.width - 200f, Screen.height * 0.8f, 1f ), Quaternion.identity, "Enemy", playerIdle, "EnemyScript", true, false );
+        BG = spriteManager.AddSprite ( Screen.height * 6f, Screen.height, new Vector3 ( Screen.height * 6f * 0.5f, Screen.height * 0.5f, 2f ), Quaternion.identity, "Background", bg, null, false, false );
 
         TimeText.gameObject.SetActive(false);
 	}
@@ -75,8 +75,8 @@ public class GameScript : MonoBehaviour
                 TimeText.text = ((int)timer + 1).ToString();
 
                 if (timer <= 0.0f &&
-                    Player.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Prepare &&
-                    Player.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Attack)
+                    Player.go.GetComponent<PlayerScript>().GetState() != PlayerScript.PlayerState.Prepare &&
+                    Player.go.GetComponent<PlayerScript> ().GetState () != PlayerScript.PlayerState.Attack )
                 {
                     state = GameState.GameOver;
                     TimeText.gameObject.SetActive(false);
@@ -90,9 +90,9 @@ public class GameScript : MonoBehaviour
 
                         if (timer <= time &&
                             numEnemyAttacks < maxEnemyAttacks &&
-                            Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Guard)
+                            Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
                         {
-                            Enemy.GetComponent<EnemyScript>().Attack();
+                            Enemy.go.GetComponent<EnemyScript> ().Attack ();
                             enemyAttackTimes.RemoveAt(0);
                             numEnemyAttacks++;
                         }
@@ -101,55 +101,55 @@ public class GameScript : MonoBehaviour
                     if (Input.GetButtonDown("Attack") &&
                         hitted == false &&
                         gotHit == false &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle)
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Idle )
                     {
-                        Player.GetComponent<PlayerScript>().Attack();
+                        Player.go.GetComponent<PlayerScript> ().Attack ();
                     }
 
                     // Change to an collision detect
                     if ( hitted == false &&
-                        Player.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Attack &&
-                        Enemy.GetComponent<EnemyScript>().GetState () == EnemyScript.EnemyState.Prepare ) {
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Attack &&
+                        Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Prepare ) {
                         hitted = true;
                     } 
                     
                     if ( hitted == false &&
-                        Player.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Attack &&
-                        Enemy.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Attack &&
+                        Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
                     {
-                        Enemy.GetComponent<EnemyScript>().Guard();
+                        Enemy.go.GetComponent<EnemyScript> ().Guard ();
                     }
 
                     // Change to an collision detect
                     if (gotHit == false &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Prepare &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Attack)
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Prepare &&
+                        Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Attack )
                     {
                         gotHit = true;
                     }
                     
                     if (gotHit == false &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Attack)
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Idle &&
+                        Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Attack )
                     {
-                        Player.GetComponent<PlayerScript>().Guard();
+                        Player.go.GetComponent<PlayerScript> ().Guard ();
                     }
 
                     if (hitted == true &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Idle)
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Idle &&
+                        Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
                     {
-                        Enemy.GetComponent<EnemyScript>().Die();
+                        Enemy.go.GetComponent<EnemyScript> ().Die ();
                         state = GameState.Victory;
                         TimeText.gameObject.SetActive(false);
                         StateText.text = "VICTORY!";
                     }
 
                     if (gotHit == true &&
-                        Player.GetComponent<PlayerScript>().GetState() == PlayerScript.PlayerState.Idle &&
-                        Enemy.GetComponent<EnemyScript>().GetState() == EnemyScript.EnemyState.Idle)
+                        Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Idle &&
+                        Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
                     {
-                        Player.GetComponent<PlayerScript>().Die();
+                        Player.go.GetComponent<PlayerScript> ().Die ();
                         state = GameState.GameOver;
                         TimeText.gameObject.SetActive(false);
                         StateText.text = "GAME OVER!";
@@ -159,15 +159,8 @@ public class GameScript : MonoBehaviour
                 break;
 
             case GameState.Victory:
-                if (Input.GetButtonDown("Reset"))
-                {
-                    state = GameState.GetReady;
-                    StateText.text = "Get Ready!";
-                }
-                break;
-
             case GameState.GameOver:
-                if ( Input.GetButtonDown("Reset"))
+                if (Input.GetButtonDown("Reset"))
                 {
                     state = GameState.GetReady;
                     StateText.text = "Get Ready!";
@@ -184,6 +177,9 @@ public class GameScript : MonoBehaviour
         numEnemyAttacks = 0;
         hitted = false;
         gotHit = false;
+
+        Enemy.go.GetComponent<EnemyScript> ().Reset ();
+        Player.go.GetComponent<PlayerScript> ().Reset ();
 
         int interval = (int) TURN_TIME / maxEnemyAttacks;
 

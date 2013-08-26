@@ -18,7 +18,7 @@ public class EnemyScript : MonoBehaviour {
     private const float ATTACK_TIME = 0.5f; // Change to an animation time
     private const float DYING_TIME = 1.0f;
 
-    private EnemyState state = EnemyState.Guard;
+    private EnemyState state = EnemyState.Idle;
     private GameScript gs;
 
     private float timer = 0.0f;
@@ -39,6 +39,8 @@ public class EnemyScript : MonoBehaviour {
                 gameObject.renderer.material.mainTexture = gs.enemyDef;
                 if ( timer <= 0.0f ) {
                     state = EnemyState.Idle;
+                    gs.Enemy.width = 100f;
+                    gs.Enemy.height = 160f;
                 }
                 break;
 
@@ -49,6 +51,8 @@ public class EnemyScript : MonoBehaviour {
 	            {
 	                state = EnemyState.Attack;
 	                timer = ATTACK_TIME;
+                    gs.Enemy.width = 140f;
+                    gs.Enemy.height = 140f;
 	            }
 	            break;
 
@@ -58,6 +62,8 @@ public class EnemyScript : MonoBehaviour {
 	            if (timer <= 0.0f)
 	            {
 	                state = EnemyState.Idle;
+                    gs.Enemy.width = 100f;
+                    gs.Enemy.height = 160f;
 	            }
 	            break;
 
@@ -66,6 +72,8 @@ public class EnemyScript : MonoBehaviour {
                 timer -= Time.deltaTime;
                 if ( timer <= 0.0f ) {
                     state = EnemyState.Dead;
+                    gs.Enemy.width = 200f;
+                    gs.Enemy.height = 100f;
                 }
                 break;
 
@@ -84,15 +92,27 @@ public class EnemyScript : MonoBehaviour {
     {
         state = EnemyState.Prepare;
         timer = PREPARE_TIME;
+        gs.Enemy.width = 100f;
+        gs.Enemy.height = 160f;
     }
 
     public void Guard () {
         state = EnemyState.Guard;
         timer = GUARD_TIME;
+        gs.Enemy.width = 100f;
+        gs.Enemy.height = 160f;
     }
 
     public void Die () {
         state = EnemyState.Dying;
         timer = DYING_TIME;
+        gs.Enemy.width = 160f;
+        gs.Enemy.height = 120f;
+    }
+
+    public void Reset () {
+        state = EnemyState.Idle;
+        gs.Enemy.width = 100f;
+        gs.Enemy.height = 160f;
     }
 }
