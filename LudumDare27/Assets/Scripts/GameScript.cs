@@ -137,6 +137,7 @@ public class GameScript : MonoBehaviour
                             Enemy.go.GetComponent<EnemyScript> ().GetState () == EnemyScript.EnemyState.Idle )
                         {
                             Enemy.go.GetComponent<EnemyScript> ().Attack ();
+                            Enemy.go.audio.PlayOneShot ( prepareSFX );
                             enemyAttackTimes.RemoveAt(0);
                             numEnemyAttacks++;
                         }
@@ -148,6 +149,7 @@ public class GameScript : MonoBehaviour
                         Player.go.GetComponent<PlayerScript> ().GetState () == PlayerScript.PlayerState.Idle )
                     {
                         Player.go.GetComponent<PlayerScript> ().Attack ();
+                        Player.go.audio.PlayOneShot ( prepareSFX );
                     }
 
                     // Change to an collision detect
