@@ -27,6 +27,9 @@ public class EnemyScript : MonoBehaviour {
 	void Start ()
 	{
         gs = GameObject.Find ( "GameLogic" ).GetComponent<GameScript> ();
+        gameObject.AddComponent ( "AudioSource" );
+        gameObject.audio.volume = 1f;
+        gameObject.audio.loop = false;
 	}
 	
 	void Update ()
@@ -121,6 +124,7 @@ public class EnemyScript : MonoBehaviour {
         timer = PREPARE_TIME;
         gs.Enemy.width = 100f;
         gs.Enemy.height = 160f;
+        gameObject.audio.PlayOneShot ( gs.attackSFX );
     }
 
     public void Guard () {
@@ -128,6 +132,7 @@ public class EnemyScript : MonoBehaviour {
         timer = GUARD_TIME;
         gs.Enemy.width = 100f;
         gs.Enemy.height = 160f;
+        gameObject.audio.PlayOneShot ( gs.defSFX );
     }
 
     public void Die () {
@@ -135,6 +140,7 @@ public class EnemyScript : MonoBehaviour {
         timer = DYING_TIME;
         gs.Enemy.width = 160f;
         gs.Enemy.height = 120f;
+        gameObject.audio.PlayOneShot ( gs.enemyDieSFX );
     }
 
     public void Reset () {

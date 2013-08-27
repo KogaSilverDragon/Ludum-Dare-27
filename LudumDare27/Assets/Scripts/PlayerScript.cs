@@ -28,9 +28,9 @@ public class PlayerScript : MonoBehaviour
     private void Start()
     {
         gs = GameObject.Find("GameLogic").GetComponent<GameScript> ();
-
-        HOTween.Init ( false, false, true );
-        HOTween.EnableOverwriteManager ();
+        gameObject.AddComponent ( "AudioSource" );
+        gameObject.audio.volume = 1f;
+        gameObject.audio.loop = false;
     }
 	
     private void Update()
@@ -129,6 +129,7 @@ public class PlayerScript : MonoBehaviour
         timer = PREPARE_TIME;
         gs.Player.width = 100f;
         gs.Player.height = 160f;
+        gameObject.audio.PlayOneShot (gs.attackSFX);
     }
 
     public void Guard () {
@@ -136,6 +137,7 @@ public class PlayerScript : MonoBehaviour
         timer = GUARD_TIME;
         gs.Player.width = 100f;
         gs.Player.height = 160f;
+        gameObject.audio.PlayOneShot ( gs.defSFX );
     }
 
     public void Die () {
@@ -144,6 +146,7 @@ public class PlayerScript : MonoBehaviour
         gs.Player.width = 160f;
         gs.Player.height = 120f;
         HOTween.To ( gs.Player, ATTACK_TIME, "position", gs.startPlayerPos - new Vector3 ( 100f, 0, 0 ) );
+        gameObject.audio.PlayOneShot ( gs.playerDieSFX );
     }
 
     public void Reset () {
